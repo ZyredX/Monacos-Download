@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>Editor</title>
+
   <style type="text/css" media="screen">
     html, body {
       margin: 0;
@@ -39,37 +40,22 @@
       height: 100%;
       background: transparent !important;
       z-index: 1;
+      font-family: Consolas, 'Microsoft YaHei UI', monospace;
     }
 
-    /* 🎨 Scrollbar personalizado SIEMPRE visible */
-    .ace_scrollbar {
-      opacity: 1 !important;
-      visibility: visible !important;
-      display: block !important;
-    }
-
+    /* 🎨 Scrollbars personalizados y visibles */
     .ace_scrollbar-v, .ace_scrollbar-h {
-      scrollbar-gutter: stable both-edges;
+      background: #2b2b2b !important; /* Track */
     }
 
-    .ace_scrollbar::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-
-    .ace_scrollbar::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-    }
-
-    .ace_scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(150, 150, 150, 0.35);
-      border-radius: 10px;
+    .ace_scrollbar-inner {
+      background: #5c5c5c !important; /* Thumb */
+      border-radius: 6px !important;
       transition: background 0.25s ease;
     }
 
-    .ace_scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(200, 200, 200, 0.55);
+    .ace_scrollbar-inner:hover {
+      background: #9c9c9c !important;
     }
 
     /* ✨ Mejoras visuales para el Ace Editor */
@@ -84,7 +70,7 @@
     }
 
     .ace_cursor {
-      color: rgba(255, 255, 255, 0.9) !important;
+      border-left: 2px solid #f8f8f2 !important;
     }
   </style>
 
@@ -101,15 +87,12 @@
       const possibleImages = ["image.jpg", "image.png", "image.gif"];
       for (const imgFile of possibleImages) {
         const img = new Image();
-        img.onload = function () {
-          document.body.style.backgroundImage = `url('${imgFile}')`;
-        };
-        img.onerror = function () {};
+        img.onload = () => document.body.style.backgroundImage = `url('${imgFile}')`;
         img.src = imgFile;
       }
     })();
 
-    // 🎨 Configuración del editor ACE
+    // 🎨 Configuración base del editor ACE
     ace.require("ace/ext/language_tools");
     const editor = ace.edit("editor");
     editor.setTheme("ace/theme/tomorrow_night_eighties");
@@ -120,42 +103,33 @@
     editor.setHighlightActiveLine(true);
     editor.setOption("scrollPastEnd", 1);
     editor.renderer.setScrollMargin(10, 10, 0, 0);
-
-    // 🔧 Fuerza scrollbars visibles
-    editor.renderer.setScrollBarAlwaysVisible(true);
-
-    // 💪 Fuerza scroll horizontal y vertical permanentemente
-    const forceScrollbars = () => {
-      const renderer = editor.renderer;
-      if (renderer.scrollBarV) renderer.scrollBarV.element.style.display = "block";
-      if (renderer.scrollBarH) renderer.scrollBarH.element.style.display = "block";
-      if (renderer.scrollBarH) renderer.scrollBarH.element.style.height = "10px";
-      if (renderer.scrollBarV) renderer.scrollBarV.element.style.width = "10px";
-    };
-    setInterval(forceScrollbars, 500); // mantener visibles sin parpadeo
-
-    // 📏 Asegurar que haya contenido ancho para scroll horizontal
-    const longLine = "-- línea larga para probar scroll horizontal →→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→";
-    let content = "";
-    for (let i = 1; i <= 80; i++) {
-      content += `print("${i} ${longLine}")\n`;
-    }
-    editor.setValue(content);
-
     editor.setOptions({
-      fontSize: "14px",
-      fontFamily: "Consolas, 'Microsoft YaHei UI', monospace",
+      fontSize: "13px",
       useSoftTabs: true,
       tabSize: 2,
     });
 
-    // 📜 Funciones globales
-    window.GetText = () => editor.getValue();
-    window.SetText = x => { editor.setValue(x); editor.session.setValue(x); };
-    window.ClearText = () => editor.setValue("");
-    window.SetTheme = theme => editor.setTheme("ace/theme/" + theme);
+    // 💪 Fuerza scrollbars visibles
+    const forceScrollbars = () => {
+      const r = editor.renderer;
+      if (r.scrollBarV) r.scrollBarV.element.style.display = "block";
+      if (r.scrollBarH) r.scrollBarH.element.style.display = "block";
+    };
+    setInterval(forceScrollbars, 500);
 
-    document.oncontextmenu = () => false;
+    // 📜 Contenido de prueba (para scroll visible)
+    let content = "";
+    for (let i = 1; i <= 60; i++) content += `print("${i} ${longLine}")\n`;
+    editor.setValue(content);
+
+    // 🌍 Funciones globales accesibles desde C# o externo
+    window.GetText = function () { return editor.getValue(); };
+    window.SetText = function (x) { editor.setValue(x); editor.session.setValue(x); };
+    window.ClearText = function () { editor.setValue(""); };
+    window.SetTheme = function (theme) { editor.setTheme("ace/theme/" + theme); };
+
+    // 🚫 Deshabilitar clic derecho
+    document.oncontextmenu = function () { return false; };
   </script>
 </body>
 </html>
