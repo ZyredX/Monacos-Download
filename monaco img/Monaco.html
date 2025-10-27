@@ -14,14 +14,11 @@
     }
 
     body {
-      background-image: url('image.jpg'); 
-      background-image: url('image.png');
-      background-image: url('image.gif');	  /* 👈 tu imagen aquí */
+      background-color: #1a1a1a;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       background-attachment: fixed;
-      background-color: #1a1a1a;
       position: relative;
     }
 
@@ -37,17 +34,14 @@
 
     #editor {
       position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
       background: transparent !important;
       z-index: 1;
     }
 
-    /* Scrollbar con transparencia */
+    /* Scrollbar moderno */
     ::-webkit-scrollbar {
       width: 10px;
       height: 10px;
@@ -63,25 +57,21 @@
       background: rgba(200, 200, 200, 0.55);
     }
 
-    /* 🔥 Barra de línea activa transparente */
+    /* Ace Editor mejoras visuales */
     .ace_marker-layer .ace_active-line {
-      background-color: rgba(255, 255, 255, 0.08) !important; /* suave y translúcido */
+      background-color: rgba(255, 255, 255, 0.08) !important;
     }
-
-    /* 🔥 Números de línea más suaves */
     .ace_gutter {
       background: rgba(0, 0, 0, 0.25) !important;
       color: rgba(200, 200, 200, 0.65) !important;
       border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
-
-    /* 🔥 Color del cursor */
     .ace_cursor {
       color: rgba(255, 255, 255, 0.9) !important;
     }
   </style>
 
-  <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ace/ace.js" type="text/javascript"></script>
   <script src="ace/ext-language_tools.js"></script>
 </head>
 
@@ -89,10 +79,22 @@
   <pre id="editor"></pre>
 
   <script>
-    var GetText, SetText, ClearText, SetTheme;
+    // 🌆 Buscar automáticamente image.jpg, image.png o image.gif
+    (function setBackgroundImage() {
+      const possibleImages = ["image.jpg", "image.png", "image.gif"];
+      for (const imgFile of possibleImages) {
+        const img = new Image();
+        img.onload = function () {
+          document.body.style.backgroundImage = `url('${imgFile}')`;
+        };
+        img.onerror = function () {};
+        img.src = imgFile;
+      }
+    })();
 
+    // 🎨 Configuración del editor ACE
     ace.require("ace/ext/language_tools");
-    var editor = ace.edit("editor");
+    const editor = ace.edit("editor");
     editor.setTheme("ace/theme/tomorrow_night_eighties");
     editor.session.setMode("ace/mode/lua");
     editor.setOption("enableLiveAutocompletion", true);
@@ -104,26 +106,13 @@
       fontFamily: "Consolas, 'Microsoft YaHei UI', monospace"
     });
 
-    GetText = function() {
-      return editor.getValue();
-    }
+    // 📜 Funciones globales
+    window.GetText = () => editor.getValue();
+    window.SetText = x => { editor.setValue(x); editor.session.setValue(x); };
+    window.ClearText = () => editor.setValue("");
+    window.SetTheme = theme => editor.setTheme("ace/theme/" + theme);
 
-    SetText = function(x) {
-      editor.setValue(x);
-      editor.session.setValue(x);
-    }
-
-    ClearText = function() {
-      editor.setValue("");
-    }
-
-    SetTheme = function(theme) {
-      editor.setTheme("ace/theme/" + theme);
-    }
-
-    document.oncontextmenu = function() {
-      return false;
-    }
+    document.oncontextmenu = () => false;
   </script>
 </body>
 </html>
