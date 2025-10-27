@@ -118,6 +118,7 @@
     setInterval(forceScrollbars, 500);
 
     // 📜 Contenido de prueba (para scroll visible)
+    const longLine = "";
     let content = "";
     for (let i = 1; i <= 60; i++) content += `print("${i} ${longLine}")\n`;
     editor.setValue(content);
