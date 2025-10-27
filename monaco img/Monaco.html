@@ -22,7 +22,7 @@
       position: relative;
     }
 
-    /* Capa oscura con blur */
+    /* 🌑 Capa oscura con blur */
     body::before {
       content: "";
       position: absolute;
@@ -41,31 +41,48 @@
       z-index: 1;
     }
 
-    /* Scrollbar moderno */
-    ::-webkit-scrollbar {
+    /* 🎨 Scrollbar personalizado SIEMPRE visible */
+    .ace_scrollbar {
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+    }
+
+    .ace_scrollbar-v, .ace_scrollbar-h {
+      scrollbar-gutter: stable both-edges;
+    }
+
+    .ace_scrollbar::-webkit-scrollbar {
       width: 10px;
       height: 10px;
     }
-    ::-webkit-scrollbar-track {
+
+    .ace_scrollbar::-webkit-scrollbar-track {
       background: rgba(255, 255, 255, 0.05);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(150, 150, 150, 0.35);
       border-radius: 10px;
     }
-    ::-webkit-scrollbar-thumb:hover {
+
+    .ace_scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(150, 150, 150, 0.35);
+      border-radius: 10px;
+      transition: background 0.25s ease;
+    }
+
+    .ace_scrollbar::-webkit-scrollbar-thumb:hover {
       background: rgba(200, 200, 200, 0.55);
     }
 
-    /* Ace Editor mejoras visuales */
+    /* ✨ Mejoras visuales para el Ace Editor */
     .ace_marker-layer .ace_active-line {
       background-color: rgba(255, 255, 255, 0.08) !important;
     }
+
     .ace_gutter {
       background: rgba(0, 0, 0, 0.25) !important;
       color: rgba(200, 200, 200, 0.65) !important;
       border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
+
     .ace_cursor {
       color: rgba(255, 255, 255, 0.9) !important;
     }
@@ -79,7 +96,7 @@
   <pre id="editor"></pre>
 
   <script>
-    // 🌆 Buscar automáticamente image.jpg, image.png o image.gif
+    // 🌆 Buscar automáticamente una imagen local (jpg, png o gif)
     (function setBackgroundImage() {
       const possibleImages = ["image.jpg", "image.png", "image.gif"];
       for (const imgFile of possibleImages) {
@@ -101,9 +118,35 @@
     editor.setOption("cursorStyle", "smooth");
     editor.setShowPrintMargin(false);
     editor.setHighlightActiveLine(true);
+    editor.setOption("scrollPastEnd", 1);
+    editor.renderer.setScrollMargin(10, 10, 0, 0);
+
+    // 🔧 Fuerza scrollbars visibles
+    editor.renderer.setScrollBarAlwaysVisible(true);
+
+    // 💪 Fuerza scroll horizontal y vertical permanentemente
+    const forceScrollbars = () => {
+      const renderer = editor.renderer;
+      if (renderer.scrollBarV) renderer.scrollBarV.element.style.display = "block";
+      if (renderer.scrollBarH) renderer.scrollBarH.element.style.display = "block";
+      if (renderer.scrollBarH) renderer.scrollBarH.element.style.height = "10px";
+      if (renderer.scrollBarV) renderer.scrollBarV.element.style.width = "10px";
+    };
+    setInterval(forceScrollbars, 500); // mantener visibles sin parpadeo
+
+    // 📏 Asegurar que haya contenido ancho para scroll horizontal
+    const longLine = "-- línea larga para probar scroll horizontal →→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→";
+    let content = "";
+    for (let i = 1; i <= 80; i++) {
+      content += `print("${i} ${longLine}")\n`;
+    }
+    editor.setValue(content);
+
     editor.setOptions({
       fontSize: "14px",
-      fontFamily: "Consolas, 'Microsoft YaHei UI', monospace"
+      fontFamily: "Consolas, 'Microsoft YaHei UI', monospace",
+      useSoftTabs: true,
+      tabSize: 2,
     });
 
     // 📜 Funciones globales
